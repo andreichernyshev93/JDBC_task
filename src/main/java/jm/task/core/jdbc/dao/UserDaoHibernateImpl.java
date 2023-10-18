@@ -22,23 +22,20 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-        String sql = "CREATE TABLE IF NOT EXISTS users(" +
-                "id INT NOT NULL AUTO_INCREMENT, name VARCHAR(30), " +
-                "lastName VARCHAR(30), age TINYINT, PRIMARY KEY(id));";
+        String sql = """
+                CREATE TABLE IF NOT EXISTS users
+                (id INT NOT NULL AUTO_INCREMENT, name VARCHAR(30), 
+                lastName VARCHAR(30), age TINYINT, PRIMARY KEY(id));
+                """;
 
-        Session session = sessionFactory.getCurrentSession();
-
-        try {
+        try (Session session = sessionFactory.getCurrentSession()) {
             transaction = session.beginTransaction();
+
             session.createSQLQuery(sql).executeUpdate();
 
             transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
     }
 
@@ -46,27 +43,20 @@ public class UserDaoHibernateImpl implements UserDao {
     public void dropUsersTable() {
         String sql = "DROP TABLE IF EXISTS users;";
 
-        Session session = sessionFactory.getCurrentSession();
-
-        try {
+        try (Session session = sessionFactory.getCurrentSession()) {
             transaction = session.beginTransaction();
+
             session.createSQLQuery(sql).executeUpdate();
 
             transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        Session session = sessionFactory.getCurrentSession();
-
-        try {
+        try (Session session = sessionFactory.getCurrentSession()) {
             transaction = session.beginTransaction();
 
             User user = new User(name, lastName, age);
@@ -81,18 +71,12 @@ public class UserDaoHibernateImpl implements UserDao {
             if (transaction != null) {
                 transaction.rollback();
             }
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
     }
 
     @Override
     public void removeUserById(long id) {
-        Session session = sessionFactory.getCurrentSession();
-
-        try {
+        try (Session session = sessionFactory.getCurrentSession();) {
             transaction = session.beginTransaction();
 
             User user = session.get(User.class, id);
@@ -105,19 +89,14 @@ public class UserDaoHibernateImpl implements UserDao {
             if (transaction != null) {
                 transaction.rollback();
             }
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
     }
 
     @Override
     public List<User> getAllUsers() {
-        Session session = sessionFactory.getCurrentSession();
         List<User> userList = new ArrayList<>();
 
-        try {
+        try (Session session = sessionFactory.getCurrentSession();) {
             transaction = session.beginTransaction();
 
             CriteriaQuery<User> criteriaQuery = session.getCriteriaBuilder().createQuery(User.class);
@@ -128,22 +107,13 @@ public class UserDaoHibernateImpl implements UserDao {
             transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
-            if (transaction != null) {
-                transaction.rollback();
-            }
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
         return userList;
     }
 
     @Override
     public void cleanUsersTable() {
-        Session session = sessionFactory.getCurrentSession();
-
-        try {
+        try (Session session = sessionFactory.getCurrentSession();) {
             transaction = session.beginTransaction();
 
             CriteriaQuery<User> criteriaQuery = session.getCriteriaBuilder().createQuery(User.class);
@@ -160,10 +130,6 @@ public class UserDaoHibernateImpl implements UserDao {
             e.printStackTrace();
             if (transaction != null) {
                 transaction.rollback();
-            }
-        } finally {
-            if (session != null) {
-                session.close();
             }
         }
     }
